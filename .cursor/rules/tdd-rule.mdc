@@ -1,0 +1,155 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# テスト駆動開発（TDD）
+
+Test-Driven Development（TDD）についての情報をまとめました。
+
+## TDD の基本概念
+
+テスト駆動開発（TDD）は、コードを書く前にテストを先に書くソフトウェア開発手法です。TDD の主な考え方は、開発プロセスを導くフィードバックループを作成し、開発されるソフトウェアの信頼性と正確性を確保することです。
+
+TDD は「Red-Green-Refactor」サイクルと呼ばれる循環的なパターンに従います：
+
+1. **Red（赤）**: この段階では、特定のコード部分の望ましい動作や機能性を定義するテストを書くことから始めます。対応するコードがまだ書かれていないため、最初このテストは失敗します。この失敗するテストは「赤いテスト」と呼ばれます。
+
+2. **Green（緑）**: 失敗するテストができたら、次のステップはテストを通過させるために必要最小限のコードを書くことです。このコードは完璧または効率的でなくても構いません；目標はテストの条件を満たし、テストを通過させることです。テストが通過すると、それは「緑のテスト」となり、望ましい機能が実装されたことを示します。
+
+3. **Refactor（リファクタリング）**: テストを通過させた後、テストを緑のままにしながらコードの設計、構造、効率性を改善することができます。リファクタリングはコードの外部動作を変えずにコードに変更を加えることを含みます。テストは安全網として機能し、変更による意図しない副作用を捉えるのに役立ちます。
+
+TDD サイクルは、次の機能部分のための新しいテスト作成から始めて繰り返されます。このプロセスにより、コードが常にテストによってバックアップされ、コードベースが進化するにつれてバグや回帰を捉えやすくなります。
+
+## 簡単な例で TDD を理解する
+
+2 つの数字を足す単純な関数を作成する必要があるとします。TDD を適用してこの関数を開発する方法は以下の通りです：
+
+1. **テストを書く**: まず、`add`関数の動作を定義するテストを書きます。
+
+```kotlin
+import org.junit.Test
+import kotlin.test.assertEquals
+
+class AdderTest {
+    @Test
+    fun `test addition`() {
+        val result = 2.add(3)
+        assertEquals(5, result)
+    }
+}
+```
+
+この時点では、`add`関数はまだ定義されていませんが、テストではすでに参照されています。
+
+2. **最小限のコードを実装する**: 次に、`add`関数を別のファイルに実装します：
+
+```kotlin
+fun Int.add(a: Int): Int = this + a
+```
+
+ここでの目標は、できるだけ早くテストを通過させることです。
+
+3. **テストを実行する**: テストを実行すると、`test addition`テストは通過し、`add`関数が期待通りに動作することを確認します。
+
+4. **より多くのテストを追加する**: 足し算機能をさらに検証するために、より多くのテストケースを追加します：
+
+```kotlin
+@Test
+fun `test addition with overflow`() {
+    val result = 2.add(Int.MAX_VALUE)
+    assertTrue(result < 0)
+}
+```
+
+5. **リファクタリング**: 要件に基づいてコードをリファクタリングできます。オーバーフロー値が必要か、あるいは入力値をフィルタリング/検証できるかによって変わります。
+
+## より複雑な例：ユーザー認証システム
+
+ユーザー認証システムというより複雑なシナリオを考えてみましょう。TDD を使用してログイン機能を実装します。
+
+1. **テストを書く**: `LoginTest.kt`というファイルでユーザーログインのテストから始めます：
+
+```kotlin
+import org.junit.Test
+import org.junit.Assert.assertEquals
+
+class LoginTest {
+
+    @Test
+    fun `test valid login`() {
+        val authService = AuthService()
+        val result = authService.login("username", "password")
+        assertEquals(LoginResult.SUCCESS, result)
+    }
+}
+```
+
+`AuthService`と`LoginResult`をまだ実装していないため、テストが失敗することを確認します。
+
+2. **最小限のコードを実装する**: `AuthService`という名前のクラスを作成します：
+
+```kotlin
+class AuthService {
+
+    fun login(username: String, password: String): LoginResult {
+        // ログインロジックをここに実装
+        return LoginResult.SUCCESS
+    }
+}
+```
+
+可能なログイン結果を表す`LoginResult`という名前の列挙型クラスを作成します：
+
+```kotlin
+enum class LoginResult {
+    SUCCESS,
+    INVALID_CREDENTIALS,
+    NETWORK_ERROR
+}
+```
+
+3. **テストを実行する**: 先ほど作成したテスト（`test valid login`）を実行します。`AuthService`に必要なコードを実装しましたので、テストは通過するはずです。
+
+4. **より多くのテストを追加する**: ログイン機能をさらに検証するために、`LoginTest`クラスにより多くのテストを追加します：
+
+```kotlin
+@Test
+fun `test invalid credentials`() {
+    val authService = AuthService()
+    val result = authService.login("username", "wrong_password")
+    assertEquals(LoginResult.INVALID_CREDENTIALS, result)
+}
+
+@Test
+fun `test network error`() {
+    val authService = AuthService()
+    val result = authService.login("username", "password")
+    assertEquals(LoginResult.NETWORK_ERROR, result)
+}
+```
+
+5. **実装を強化する**: テストが通過したら、無効な認証情報やネットワークエラーなど、さまざまなシナリオを処理するために`AuthService`実装を強化できます。
+
+この TDD アプローチに従うことで、ログイン機能が徹底的にテストされ、将来の変更が既存の動作を誤って壊さないことを確保します。
+
+これは簡略化された例であることを覚えておいてください。実際のアプリケーションでは、より複雑なロジック、バックエンドとの統合、より包括的なテストがあるでしょう。TDD は、各変更の前後にその動作を体系的に検証することで、堅牢で信頼性の高いログインシステムを構築するのに役立ちます。
+
+## TDD の利点
+
+テスト駆動開発（TDD）の利点は以下の通りです：
+
+1. **コード品質の向上**: TDD は最初から清潔で保守可能かつモジュール化されたコードを書くことに重点を置くことを強制します。テストを先に書くことで、開発者はコードの設計とアーキテクチャについて批判的に考える必要があり、より高いコード品質と少ない設計上の欠陥につながります。
+
+2. **バグと欠陥の削減**: TDD では、テストがコード実装の前に書かれるため、バグと欠陥が開発プロセスの早い段階で特定されます。このプロアクティブなアプローチは、問題が広がり、修正がより困難で費用がかかるようになる前に問題を捉えるのに役立ちます。
+
+3. **デバッグと開発の迅速化**: TDD はコードの小さく隔離されたセクションで問題を特定することで、デバッグプロセスを加速します。これにより問題の特定と解決が迅速になり、最終的に全体の開発サイクルが速くなります。
+
+4. **自信を持ったリファクタリング**: TDD は既存の機能を壊す恐れなくコードをリファクタリングする自信を提供します。リファクタリング後にテストが通過すれば、開発者は自分の変更が新しい欠陥を導入していないことを確信でき、より保守可能で適応性のあるコードベースになります。
+
+これらの利点により、テスト駆動開発は、より少ない欠陥、より速い開発サイクル、そして開発者の自信の増加を伴う高品質のソフトウェアを作成するための強力な実践となります。
+
+## 参考資料
+
+- [Test-Driven Development (TDD): A Step-by-Step Guide](https://medium.com/getir/test-driven-development-tdd-a-step-by-step-guide-2046a075b9d0)
