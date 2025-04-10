@@ -10,7 +10,7 @@
  * @returns True if the identifier has a dangling underscore
  */
 export function isIdentifierWithDanglingUnderscore(name: string): boolean {
-  return name.startsWith("_") || name.endsWith("_");
+    return name.startsWith("_") || name.endsWith("_");
 }
 
 /**
@@ -21,7 +21,7 @@ export function isIdentifierWithDanglingUnderscore(name: string): boolean {
  * @returns True if the identifier is a special name
  */
 export function isSpecialName(name: string): boolean {
-  const SPECIAL_NAMES = ["__proto__", "__dirname", "__filename"];
+    const SPECIAL_NAMES = ["__proto__", "__dirname", "__filename"];
 
-  return SPECIAL_NAMES.includes(name);
+    return SPECIAL_NAMES.includes(name);
 }
