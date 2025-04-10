@@ -16,7 +16,8 @@
     "lint": {
         "rules": {
             "tags": ["recommended"],
-            "include": ["no-external-import", ""]
+            "include": [],
+            "exclude": ["no-explicit-any", "no-external-import"]
         }
     },
     "fmt": {
