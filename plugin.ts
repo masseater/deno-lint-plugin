@@ -41,100 +41,12 @@ const DEFAULT_OPTIONS: NoUnderscoreDangleOptions = {
   allowFunctionParams: true,
 };
 
-// Type definitions for Deno's lint API
-type LintContext = {
-  options: Record<string, unknown>;
-  getParent(): any;
-  getAncestor(n: number): any;
-  report(diagnostic: {
-    id: string;
-    message: string;
-    range: [number, number];
-    fix?: { range: [number, number]; text: string };
-  }): void;
-};
-
-// Define node types
+// Type definitions for AST nodes
 interface IdentifierNode {
   type: "Identifier";
   name: string;
   range: [number, number];
 }
-
-/**
- * Rule implementation for no-underscore-dangle
- */
-const noUnderscoreDangleRule = {
-  documentation: {
-    description: "Disallow dangling underscores in identifiers",
-    url: "https://github.com/yourusername/deno-no-underscore-dangle",
-  },
-  schema: {
-    oneOf: [
-      {
-        type: "object",
-        properties: {
-          allow: { type: "array", items: { type: "string" } },
-          allowAfterThis: { type: "boolean" },
-          allowAfterSuper: { type: "boolean" },
-          allowAfterThisConstructor: { type: "boolean" },
-          enforceInMethodNames: { type: "boolean" },
-          enforceInClassFields: { type: "boolean" },
-          allowInArrayDestructuring: { type: "boolean" },
-          allowInObjectDestructuring: { type: "boolean" },
-          allowFunctionParams: { type: "boolean" },
-        },
-        additionalProperties: false,
-      },
-    ],
-  },
-  visit(node: any, context: LintContext) {
-    const options: NoUnderscoreDangleOptions = {
-      ...DEFAULT_OPTIONS,
-      ...(context.options as NoUnderscoreDangleOptions),
-    };
-
-    // Handle different node types
-    switch (node.type) {
-      case "Identifier": {
-        return handleIdentifier(node as IdentifierNode, context, options);
-      }
-      case "PropertyDefinition": {
-        // Handle class fields if enforceInClassFields is enabled
-        if (
-          options.enforceInClassFields === true &&
-          node.key.type === "Identifier"
-        ) {
-          return handleIdentifier(node.key as IdentifierNode, context, options);
-        }
-        break;
-      }
-      case "MethodDefinition": {
-        // Handle method names if enforceInMethodNames is enabled
-        if (
-          options.enforceInMethodNames === true &&
-          node.key.type === "Identifier"
-        ) {
-          return handleIdentifier(node.key as IdentifierNode, context, options);
-        }
-        break;
-      }
-      case "Property": {
-        // Handle object property names
-        if (node.key.type === "Identifier" && node.method) {
-          if (options.enforceInMethodNames === true) {
-            return handleIdentifier(
-              node.key as IdentifierNode,
-              context,
-              options
-            );
-          }
-        }
-        break;
-      }
-    }
-  },
-};
 
 /**
  * Plugin implementation for no-underscore-dangle rule
@@ -146,10 +58,71 @@ export const noUnderscoreDanglePlugin = {
     version: "0.1.0",
   },
   rules: {
-    "no-underscore-dangle": noUnderscoreDangleRule,
-  },
-  onInitHandler() {
-    // Optional cleanup code when the plugin is finished
+    "no-underscore-dangle": {
+      create(context: any) {
+        return {
+          Identifier(node: any) {
+            handleIdentifier(node, context, DEFAULT_OPTIONS);
+          },
+
+          PropertyDefinition(node: any) {
+            // Handle class fields if enforceInClassFields is enabled
+            const options = { ...DEFAULT_OPTIONS, ...context.options };
+            if (
+              options.enforceInClassFields &&
+              node.key.type === "Identifier"
+            ) {
+              handleIdentifier(node.key, context, options);
+            }
+          },
+
+          MethodDefinition(node: any) {
+            // Handle method names if enforceInMethodNames is enabled
+            const options = { ...DEFAULT_OPTIONS, ...context.options };
+            if (
+              options.enforceInMethodNames &&
+              node.key.type === "Identifier"
+            ) {
+              handleIdentifier(node.key, context, options);
+            }
+          },
+
+          Property(node: any) {
+            // Handle object property names
+            const options = { ...DEFAULT_OPTIONS, ...context.options };
+            if (node.key.type === "Identifier" && node.method) {
+              if (options.enforceInMethodNames) {
+                handleIdentifier(node.key, context, options);
+              }
+            }
+          },
+        };
+      },
+
+      meta: {
+        docs: {
+          description: "Disallow dangling underscores in identifiers",
+          url: "https://github.com/yourusername/deno-no-underscore-dangle",
+        },
+        schema: [
+          {
+            type: "object",
+            properties: {
+              allow: { type: "array", items: { type: "string" } },
+              allowAfterThis: { type: "boolean" },
+              allowAfterSuper: { type: "boolean" },
+              allowAfterThisConstructor: { type: "boolean" },
+              enforceInMethodNames: { type: "boolean" },
+              enforceInClassFields: { type: "boolean" },
+              allowInArrayDestructuring: { type: "boolean" },
+              allowInObjectDestructuring: { type: "boolean" },
+              allowFunctionParams: { type: "boolean" },
+            },
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
   },
 };
 
@@ -157,8 +130,8 @@ export const noUnderscoreDanglePlugin = {
  * Handles identifiers and checks for dangling underscores
  */
 function handleIdentifier(
-  node: IdentifierNode,
-  context: LintContext,
+  node: any,
+  context: any,
   options: NoUnderscoreDangleOptions
 ): void {
   // Skip if parent indicates an allowed context
@@ -180,9 +153,8 @@ function handleIdentifier(
 
     // Report the issue
     context.report({
-      id: "no-underscore-dangle/no-underscore-dangle",
+      node,
       message: `Identifier '${node.name}' with dangling underscore is not allowed.`,
-      range: node.range,
       fix: generateFix(node),
     });
   }
@@ -192,8 +164,8 @@ function handleIdentifier(
  * Determines if the identifier should be skipped based on parent node context
  */
 function shouldSkipBasedOnParent(
-  node: IdentifierNode,
-  context: LintContext,
+  node: any,
+  context: any,
   options: NoUnderscoreDangleOptions
 ): boolean {
   const parent = context.getParent();
@@ -273,22 +245,24 @@ function shouldSkipBasedOnParent(
  * Generates a fix for the dangling underscore
  */
 function generateFix(
-  node: IdentifierNode
+  node: any
 ): { range: [number, number]; text: string } | undefined {
   const name = node.name;
 
   // If starts with underscore, remove it
   if (name.startsWith("_")) {
+    const start = node.range?.[0] ?? node.start;
     return {
-      range: [node.range[0], node.range[0] + 1],
+      range: [start, start + 1],
       text: "",
     };
   }
 
   // If ends with underscore, remove it
   if (name.endsWith("_")) {
+    const end = node.range?.[1] ?? node.end;
     return {
-      range: [node.range[1] - 1, node.range[1]],
+      range: [end - 1, end],
       text: "",
     };
   }
