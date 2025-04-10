@@ -9,6 +9,15 @@ interface Diagnostic {
     }[];
 }
 
+/**
+ * 診断結果の型を確認する関数
+ */
+function isDiagnosticArray(value: unknown): value is Diagnostic[] {
+    return Array.isArray(value) &&
+        (value.length === 0 ||
+            (value[0] && typeof value[0].message === "string"));
+}
+
 // 基本的なテスト
 Deno.test("no-underscore-dangle - should report leading underscores", async () => {
     const code = "const _foo = 'bar'; function _test() {}";
@@ -17,7 +26,13 @@ Deno.test("no-underscore-dangle - should report leading underscores", async () =
     try {
         // Deno.lintを使用するが、存在しない場合はテストをスキップ
         if (typeof Deno.lint?.runPlugin === "function") {
-            diagnostics = await Deno.lint.runPlugin(plugin, "test.ts", code) as Diagnostic[];
+            const result = await Deno.lint.runPlugin(plugin, "test.ts", code);
+            if (isDiagnosticArray(result)) {
+                diagnostics = result;
+            } else {
+                console.warn("Unexpected result format from lint API");
+                return;
+            }
         } else {
             console.warn("Deno.lint API is not available, skipping test");
             return;
@@ -49,7 +64,13 @@ Deno.test("no-underscore-dangle - should report trailing underscores", async () 
     try {
         // Deno.lintを使用するが、存在しない場合はテストをスキップ
         if (typeof Deno.lint?.runPlugin === "function") {
-            diagnostics = await Deno.lint.runPlugin(plugin, "test.ts", code) as Diagnostic[];
+            const result = await Deno.lint.runPlugin(plugin, "test.ts", code);
+            if (isDiagnosticArray(result)) {
+                diagnostics = result;
+            } else {
+                console.warn("Unexpected result format from lint API");
+                return;
+            }
         } else {
             console.warn("Deno.lint API is not available, skipping test");
             return;
@@ -81,7 +102,13 @@ Deno.test("no-underscore-dangle - should not report identifiers without undersco
     try {
         // Deno.lintを使用するが、存在しない場合はテストをスキップ
         if (typeof Deno.lint?.runPlugin === "function") {
-            diagnostics = await Deno.lint.runPlugin(plugin, "test.ts", code) as Diagnostic[];
+            const result = await Deno.lint.runPlugin(plugin, "test.ts", code);
+            if (isDiagnosticArray(result)) {
+                diagnostics = result;
+            } else {
+                console.warn("Unexpected result format from lint API");
+                return;
+            }
         } else {
             console.warn("Deno.lint API is not available, skipping test");
             return;
@@ -105,7 +132,13 @@ Deno.test("no-underscore-dangle - should not report special identifiers", async 
     try {
         // Deno.lintを使用するが、存在しない場合はテストをスキップ
         if (typeof Deno.lint?.runPlugin === "function") {
-            diagnostics = await Deno.lint.runPlugin(plugin, "test.ts", code) as Diagnostic[];
+            const result = await Deno.lint.runPlugin(plugin, "test.ts", code);
+            if (isDiagnosticArray(result)) {
+                diagnostics = result;
+            } else {
+                console.warn("Unexpected result format from lint API");
+                return;
+            }
         } else {
             console.warn("Deno.lint API is not available, skipping test");
             return;
