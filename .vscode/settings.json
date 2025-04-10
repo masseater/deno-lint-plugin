@@ -1,0 +1,8 @@
+{
+    "deno.enable": true,
+    "editor.formatOnPaste": true,
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}
