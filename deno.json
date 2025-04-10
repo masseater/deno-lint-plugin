@@ -16,8 +16,7 @@
     "lint": {
         "rules": {
             "tags": ["recommended"],
-            "include": [],
-            "exclude": ["no-explicit-any", "no-external-import"]
+            "include": ["no-external-import"]
         }
     },
     "fmt": {
@@ -25,10 +24,5 @@
         "lineWidth": 100,
         "semiColons": true,
         "singleQuote": false
-    },
-    "hooks": {
-        "git": {
-            "pre-commit": "check:all"
-        }
     }
 }

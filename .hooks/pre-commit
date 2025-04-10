@@ -1,11 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/hook.sh"
 
-# SKIP_TEST環境変数が1の場合はテストをスキップする
-if [ "$SKIP_TEST" = "1" ]; then
-    echo "テストをスキップして他のチェックのみ実行します..."
-    deno task type-check && deno task lint && deno task fmt
-else
-    echo "すべてのチェックを実行します..."
-    deno task check:all
-fi
+deno task check:all
