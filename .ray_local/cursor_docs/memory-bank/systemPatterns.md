@@ -2,7 +2,8 @@
 
 ## Architecture Overview
 
-このプラグインは、Deno の lint システムのプラグインとして動作します。基本的なアーキテクチャは次のとおりです：
+このプラグインは、Deno の lint
+システムのプラグインとして動作します。基本的なアーキテクチャは次のとおりです：
 
 ```mermaid
 flowchart TD

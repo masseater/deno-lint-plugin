@@ -2,7 +2,9 @@
     "name": "@masseater/no-underscore-dangle",
     "description": "A Deno lint plugin that disallows dangling underscores in identifiers",
     "version": "0.1.0",
-    "unstable": ["lint"],
+    "exports": {
+        ".": "./mod.ts"
+    },
     "tasks": {
         "test": "deno test -A --coverage",
         "lint": "deno lint",

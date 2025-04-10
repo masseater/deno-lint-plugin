@@ -73,13 +73,14 @@ AST ノードを走査するための Visitor パターン：
 
 ```typescript
 type Visitor = {
-  [NodeType: string]: (node: ASTNode) => void;
+    [NodeType: string]: (node: ASTNode) => void;
 };
 ```
 
 ### Context Limitations
 
-現在、`context.getParent()` に関する問題があります。この関数は Deno の lint コンテキストオブジェクトで正しく実装されていない可能性があります。
+現在、`context.getParent()` に関する問題があります。この関数は Deno の lint
+コンテキストオブジェクトで正しく実装されていない可能性があります。
 
 ## Integration Points
 

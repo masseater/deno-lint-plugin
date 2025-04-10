@@ -2,20 +2,21 @@
 
 Deno リントプラグインで、識別子の先頭または末尾のアンダースコア（`_`）を禁止するルールです。
 
-このプラグインは ESLint の[no-underscore-dangle](https://eslint.org/docs/rules/no-underscore-dangle)ルールを模倣しています。
+このプラグインは ESLint
+の[no-underscore-dangle](https://eslint.org/docs/rules/no-underscore-dangle)ルールを模倣しています。
 
 ## インストール
 
 ```json
 // deno.json
 {
-  "lint": {
-    "plugins": ["https://deno.land/x/masseater_no_underscore_dangle/mod.ts"],
-    "rules": {
-      "tags": ["recommended"],
-      "include": ["no-underscore-dangle/no-underscore-dangle"]
+    "lint": {
+        "plugins": ["https://deno.land/x/masseater_no_underscore_dangle/mod.ts"],
+        "rules": {
+            "tags": ["recommended"],
+            "include": ["no-underscore-dangle/no-underscore-dangle"]
+        }
     }
-  }
 }
 ```
 
