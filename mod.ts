@@ -11,10 +11,10 @@ import { NoUnderscoreDangleRule } from "./rules/no_underscore_dangle.ts";
  * no-underscore-dangleプラグイン
  */
 const plugin: Deno.lint.Plugin = {
-    name: "no-underscore-dangle",
+    name: "deno-lint-plugin",
     rules: {
         "no-underscore-dangle": NoUnderscoreDangleRule,
     },
-};
+} as const;
 
 export default plugin;
