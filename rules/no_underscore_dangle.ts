@@ -5,9 +5,9 @@
  */
 
 // オプションのインタフェース定義
-export interface NoUnderscoreDangleOptions {
+interface NoUnderscoreDangleOptions {
     // 許可する識別子のリスト
-    allow?: string[];
+    allow?: readonly string[];
     // thisの後のアンダースコアを許可するか（例：this._foo）
     allowAfterThis?: boolean;
     // superの後のアンダースコアを許可するか（例：super._foo）
@@ -27,24 +27,20 @@ export interface NoUnderscoreDangleOptions {
 }
 
 // デフォルトオプション
-const DEFAULT_OPTIONS: NoUnderscoreDangleOptions = {
-    allow: [],
+const DEFAULT_OPTIONS = {
+    allow: ["_id", "__dirname", "__filename", "__proto__"],
     allowAfterThis: false,
     allowAfterSuper: false,
     allowAfterThisConstructor: false,
-    enforceInMethodNames: false,
-    enforceInClassFields: false,
-    allowInArrayDestructuring: true,
-    allowInObjectDestructuring: true,
-    allowFunctionParams: true,
-};
+    enforceInMethodNames: true,
+    enforceInClassFields: true,
+    allowInArrayDestructuring: false,
+    allowInObjectDestructuring: false,
+    allowFunctionParams: false,
+} as const;
 
-// 特別に許可される識別子
-const ALLOWED_IDENTIFIERS = new Set([
-    "__proto__",
-    "__dirname",
-    "__filename",
-]);
+// 特別に許可される識別子のセット
+const ALLOWED_IDENTIFIERS = new Set<string>(["__proto__", "__dirname", "__filename"]);
 
 /**
  * no-underscore-dangle ルール

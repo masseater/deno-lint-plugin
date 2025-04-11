@@ -1,5 +1,5 @@
 {
-    "name": "@masseater/no-underscore-dangle",
+    "name": "@masseater/deno-lint-plugin",
     "description": "A Deno lint plugin that disallows dangling underscores in identifiers",
     "version": "0.1.0",
     "exports": {
@@ -10,7 +10,8 @@
         "lint": "deno lint",
         "fmt": "deno fmt",
         "type-check": "deno check .",
-        "check:all": "deno task type-check && deno task lint && deno task fmt && deno task test",
+        "tsr": "npx tsr --project . 'mod\\.ts$' '.*\\.ts$'",
+        "check:all": "deno task type-check && deno task lint && deno task fmt && deno task tsr && deno task test",
         "hook": "deno run --allow-read --allow-run --allow-write https://deno.land/x/deno_hooks@0.1.2/mod.ts",
         "hook:install": "deno task hook install",
         "hook:add": "deno task hook add"
@@ -18,7 +19,7 @@
     "lint": {
         "rules": {
             "tags": ["recommended"],
-            "include": ["no-external-import"]
+            "include": ["no-external-import", "prefer-as-const", "ban-unknown-rule-code"]
         }
     },
     "fmt": {

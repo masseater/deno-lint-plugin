@@ -1,4 +1,6 @@
-# no-underscore-dangle
+# deno-lint-plugins
+
+## no-underscore-dangle
 
 Deno リントプラグインで、識別子の先頭または末尾のアンダースコア（`_`）を禁止するルールです。
 
@@ -10,13 +12,13 @@ Deno リントプラグインで、識別子の先頭または末尾のアンダ
 ```json
 // deno.json
 {
-    "lint": {
-        "plugins": ["https://deno.land/x/masseater_no_underscore_dangle/mod.ts"],
-        "rules": {
-            "tags": ["recommended"],
-            "include": ["no-underscore-dangle/no-underscore-dangle"]
-        }
+  "lint": {
+    "plugins": ["https://deno.land/x/masseater_no_underscore_dangle/mod.ts"],
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["no-underscore-dangle/no-underscore-dangle"]
     }
+  }
 }
 ```
 
@@ -66,6 +68,27 @@ const foo_bar = "baz";
 # テストの実行
 deno test -A
 ```
+
+## コードの品質管理
+
+### TSR による未使用コードの検出
+
+未使用のコードを検出・削除するために [TSR (TypeScript Remove)](https://github.com/line/tsr)
+を使用することをお勧めします。TSR は未使用の export やモジュールを見つけて削除するツールです。
+
+```bash
+# TSRをインストール
+npm install -g tsr
+
+# 未使用コードの検出
+tsr --project tsconfig.json 'mod\.ts$'
+
+# 未使用コードの自動削除
+tsr --write --recursive --project tsconfig.json 'mod\.ts$'
+```
+
+TSR は TypeScript プロジェクトのツリーシェイキングのように機能し、未使用の export
+や変数を検出します。CI パイプラインで使用することで、未使用コードの蓄積を防ぐことができます。
 
 ## ライセンス
 
