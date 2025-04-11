@@ -12,13 +12,13 @@ Deno リントプラグインで、識別子の先頭または末尾のアンダ
 ```json
 // deno.json
 {
-  "lint": {
-    "plugins": ["https://deno.land/x/masseater_no_underscore_dangle/mod.ts"],
-    "rules": {
-      "tags": ["recommended"],
-      "include": ["no-underscore-dangle/no-underscore-dangle"]
+    "lint": {
+        "plugins": ["https://deno.land/x/masseater_no_underscore_dangle/mod.ts"],
+        "rules": {
+            "tags": ["recommended"],
+            "include": ["no-underscore-dangle/no-underscore-dangle"]
+        }
     }
-  }
 }
 ```
 
